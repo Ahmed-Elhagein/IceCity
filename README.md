@@ -1,1 +1,4 @@
-![OOP_Task](https://github.com/user-attachments/assets/e5c03dd7-7dbf-48d1-826d-ee8321384e48)
+![OOP_Task1](https://github.com/user-attachments/assets/1ffdbd0f-bc39-427b-a863-a0ad8bfe567b)
+![OOP_Task1](https://github.com/user-attachments/assets/1ffdbd0f-bc39-427b-a863-a0ad8bfe567b)
+
+ 
