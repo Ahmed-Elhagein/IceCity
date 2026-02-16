@@ -57,9 +57,9 @@ namespace IceCity
 
             double medianHeaterValue = GetMedianHeaterValue(heaterValues);
 
-            
+            int actualDaysCount = dailyUsages.Count;
 
-            double averageCost = medianHeaterValue * (totalWorkingHours / (24 * 30));
+            double averageCost = medianHeaterValue * (totalWorkingHours / (24 * actualDaysCount));
             return averageCost;
         }
 

@@ -1,101 +1,50 @@
 ﻿using System;
-using System.Data;
-
+using System.Collections.Generic;
 
 namespace IceCity
 {
-  
     class Program
     {
         static void Main(string[] args)
         {
            
-            Service1 calcService = new Service1();
-            Report reporter = new Report(calcService);
+            SimulationRepository simulator = new SimulationRepository();
+            Service1 service = new Service1();
+            Report report = new Report(service);
 
-            Console.WriteLine("--- IceCity - Week 2 OOP ---");
-            Console.Write("Enter Owner Name: ");
-            Owner owner = new Owner(Console.ReadLine());
-            House house = new House(owner);
+            
+            
+
+            Console.WriteLine("========================================");
+            Console.WriteLine("   IceCity: Smart Heating Cost System   ");
+            Console.WriteLine("========================================");
+
+            int year = InputReader.GetValidInteger("Enter Year (e.g. 2026): ", 2000, 2100);
+            int month = InputReader.GetValidInteger("Enter Month (1-12): ", 1, 12);
+
+            Console.WriteLine($"\n[System] Running simulation for: {month}/{year}...");
+            Console.WriteLine($"[System] Days in month: {DateTime.DaysInMonth(year, month)} days.");
+            Console.WriteLine("----------------------------------------\n");
 
            
-            for (int i = 1; i <= 2; i++)
+            List<Owner> owners = simulator.GetSimulatedData(year, month);
+
+            foreach (Owner owner in owners)
             {
-                Console.WriteLine("Day " + i + ":");
-                Console.Write("Choose Heater Type (1 for Electric, 2 for Gas): ");
-                string choice = Console.ReadLine();
+                Console.WriteLine($"Owner: {owner.Name}");
 
-                Console.Write("Enter Power Value: ");
-
-                // = Convert.ToDouble(Console.ReadLine());
-
-                double power = GetValidInput($"Enter Heater Value in Day ({i + 1}): ", "Error!! Heater Value must be a positive number.", 0, double.MaxValue);
-
-                Console.Write("Enter Working Hours (0-24): ");
-
-                //double hours = Convert.ToDouble(Console.ReadLine());
-
-                double hours = GetValidInput($"Enter Hours Per Day ({i + 1}): ", "Error!! Hours must be between 0 and 24.", 0, 24);
-
-
-                HeaterBase selectedHeater;
-
-                if (choice == "1")
+                foreach (House house in owner.Houses)
                 {
-                    selectedHeater = new ElectricHeater(power);
+                   
+                    string result = report.GetFinalReport(house);
+
+                    Console.WriteLine($"  -> {result}");
                 }
-                else
-                {
-                    selectedHeater = new GasHeater(power);
-                }
-
-
-               
-                DailyUsage usage = new DailyUsage(DateTime.Now, hours, selectedHeater);
-                house.AddDailyUsage(usage);
-
-                Console.Clear(); 
+                Console.WriteLine("---------------------------------------------------------------------------------------------");
             }
 
-          
-            Console.WriteLine("----------------------------------");
-            string finalReport = reporter.GetFinalReport(house);
-            Console.WriteLine(finalReport);
-            Console.WriteLine("----------------------------------");
-
-           
-            Console.WriteLine("Press any key to exit...");
+            Console.WriteLine("\nDone. Press any key to exit...");
             Console.ReadKey();
         }
-
-        
-        public static double GetValidInput(string message, string errorMessage, double min, double max)
-        {
-            double userInput;
-            bool isValid = false;
-
-            do
-            {
-                Console.Write(message);
-
-
-                if (double.TryParse(Console.ReadLine(), out userInput) && userInput >= min && userInput <= max)
-                {
-                    isValid = true;
-                }
-                else
-                {
-                    Console.WriteLine(errorMessage);
-                    isValid = false;
-                }
-
-            } while (!isValid);
-
-            return userInput;
-        }
-
-
-
-
     }
 }
