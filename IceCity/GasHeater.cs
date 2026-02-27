@@ -14,5 +14,10 @@ namespace IceCity
         {
             return Power * 0.8; 
         }
+
+        public override HeaterBase CreateReplacement()
+        {
+            return new GasHeater(this.Power);
+        }
     }
 }

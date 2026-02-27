@@ -30,7 +30,7 @@ namespace IceCity
             }
         }
 
-        //public List<House> Houses { get; private set; }
+        
 
         private readonly List<House> _houses;
 
@@ -61,7 +61,7 @@ namespace IceCity
                 throw new InvalidOperationException("House already added.");
 
 
-            _houses.Add(house);
+            _houses.Add(house); 
         }
     }
 }

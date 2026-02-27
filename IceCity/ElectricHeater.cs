@@ -14,5 +14,11 @@ namespace IceCity
         {
             return this.Power ; 
         }
+
+        public override HeaterBase CreateReplacement()
+        {
+            return new ElectricHeater(this.Power);
+        }
+
     }
 }

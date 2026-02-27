@@ -36,11 +36,23 @@ namespace IceCity
             }
         }
 
+
         public double GetMedianHeaterValue(List<double> heaterValues)
         {
+            if (heaterValues == null || heaterValues.Count == 0) return 0;
+
             BubbleSort(heaterValues);
-            var medianIndex = heaterValues.Count / 2;
-            return heaterValues[medianIndex];
+            int count = heaterValues.Count;
+
+            
+            if (count.IsEven())
+            {
+                return (heaterValues[count / 2 - 1] + heaterValues[count / 2]) / 2.0;
+            }
+            else
+            {
+                return heaterValues[count / 2];
+            }
         }
 
         public  double CalculateMonthlyAverageCost(List<DailyUsage >dailyUsages)
