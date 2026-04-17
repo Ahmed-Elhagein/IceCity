@@ -1,12 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace IceCity
 {
-   
     
     class Program
     {
@@ -16,32 +14,43 @@ namespace IceCity
             Console.WriteLine("    IceCity: System Operations & Diagnostics      ");
             Console.WriteLine("==================================================\n");
 
-           
             Owner owner = new Owner("Ahmed");
             House mainHouse = new House(owner);
             CityCenterService cityCenter = new CityCenterService();
             WeatherService weatherApi = new WeatherService();
 
+         
+            Console.WriteLine("--- SOLID Phase: Strategy & Factory Implementation ---");
+
+            ICostStrategyFactory factory = new CostStrategyFactory();
+
            
-            HeaterBase? currentHeater = new ElectricHeater(1500);
+            string chosenStrategy = "Eco";
+            ICostCalculationStrategy selectedStrategy = factory.GetStrategy(chosenStrategy);
+            Console.WriteLine($"[System] '{chosenStrategy}' strategy successfully selected from Factory.");
+
+           
+            CostService costService = new CostService(selectedStrategy);
+            Report report = new Report(costService);
+            Console.WriteLine("[System] CostService configured via Dependency Injection.\n");
+            
+            Console.WriteLine("[System] Installing the new SolarHeater...");
+            HeaterBase? currentHeater = new SolarHeater(1500);
             mainHouse.AddHeater(currentHeater);
 
-            
             SaveDailyUsageDelegate saveUsageHandler = (usage) =>
             {
                 mainHouse.AddDailyUsage(usage);
                 Console.WriteLine($"[Delegate] Saved usage: Date {usage.Date:yyyy-MM-dd}, Hours {usage.WorkingHours:F1}");
             };
 
-            
             SubscribeToHeaterEvents(currentHeater, saveUsageHandler);
 
-           
-            Console.WriteLine("--- Phase 1: Heater Operations & Failure Simulation ---");
+            
+            Console.WriteLine("\n--- Phase 1: Heater Operations & Failure Simulation ---");
 
             for (int i = 1; i <= 5; i++)
             {
-               
                 if (currentHeater == null)
                 {
                     Console.WriteLine("[System] Heater slot is currently empty (null). Skipping operation.");
@@ -53,45 +62,50 @@ namespace IceCity
                     Console.WriteLine($"\n> Attempt {i}: Turning heater ON...");
                     currentHeater.Open();
 
-                    Thread.Sleep(500); 
+                    Thread.Sleep(500);
 
                     Console.WriteLine($"> Attempt {i}: Turning heater OFF...");
                     currentHeater.Close();
                 }
                 catch (HeaterFailedException ex)
                 {
-                   
                     Console.WriteLine($"\n[ALARM] {ex.Message}");
 
-                    
                     HeaterBase brokenHeater = currentHeater;
 
-                    
                     currentHeater = null;
                     mainHouse.ReplaceHeater(0, null);
                     Console.WriteLine("[System] Broken heater removed. Current slot is null.");
 
-                    
                     var newHeater = await cityCenter.RequestReplacementAsync(mainHouse.HouseId, brokenHeater);
 
-                   
                     currentHeater = newHeater;
                     mainHouse.ReplaceHeater(0, currentHeater);
                     SubscribeToHeaterEvents(currentHeater, saveUsageHandler);
                 }
             }
 
-            
             Console.WriteLine("\n--- Phase 2: Async Weather Data Fetching ---");
             if (currentHeater != null)
             {
                 var apiUsages = await weatherApi.FetchLastMonthWeatherAsync(currentHeater);
+
+              
+                foreach (var usage in apiUsages)
+                {
+                    mainHouse.AddDailyUsage(usage);
+                }
 
                 Console.WriteLine("\n--- Phase 3: Printing with THREADS ---");
                 PrintLastMonthDailyUsageWithThreads(apiUsages);
 
                 Console.WriteLine("\n--- Phase 4: Printing with TASKS ---");
                 await PrintLastMonthDailyUsageWithTasksAsync(apiUsages);
+
+              
+                Console.WriteLine("\n--- Phase 5: Generating Final Cost Report ---");
+                string finalReport = report.GetFinalReport(mainHouse);
+                Console.WriteLine($"\n>>> {finalReport} <<<");
             }
 
             Console.WriteLine("\n==================================================");
@@ -99,8 +113,6 @@ namespace IceCity
             Console.WriteLine("==================================================");
             Console.ReadKey();
         }
-
-        
 
         static void SubscribeToHeaterEvents(HeaterBase? heater, SaveDailyUsageDelegate saveAction)
         {

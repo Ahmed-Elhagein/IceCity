@@ -56,13 +56,23 @@ namespace IceCity
             }
         }
 
-        public double CalculateHeatingCost(Service1 service)
+
+        public double CalculateHeatingCost(CostService service)
         {
             if (service == null)
                 throw new ArgumentNullException(nameof(service));
 
-            return service.CalculateMonthlyAverageCost(_dailyUsages);
+            
+            return service.CalculateMonthlyAverageCost(new System.Collections.Generic.List<DailyUsage>(_dailyUsages));
         }
+
+        //public double CalculateHeatingCost(Service1 service)
+        //{
+        //    if (service == null)
+        //        throw new ArgumentNullException(nameof(service));
+
+        //    return service.CalculateMonthlyAverageCost(_dailyUsages);
+        //}
     }
 }
 
